@@ -36,6 +36,36 @@ Grundbegriffe in 5 Minuten.
 
 ---
 
+## Was ist ueberhaupt ein Second Brain?
+
+Der Begriff stammt aus dem Buch "Building a Second Brain" (Tiago Forte, 2022).
+Die Kernidee: dein Gehirn ist gut darin **Ideen zu haben**, aber schlecht darin
+sie **zu behalten und zu vernetzen**. Ein Second Brain ist ein externes
+Wissens-System — Notizen, Strukturen, Querverweise — das dir den
+Erinnerungsaufwand abnimmt. Du wirfst Gedanken rein, sortierst sie strukturiert
+und findest sie wieder, wenn du sie brauchst. Im Idealfall verdichtet sich das
+Wissen ueber die Zeit zu mehr als der Summe seiner Teile.
+
+Es gibt **viele Wege**, ein Second Brain zu bauen:
+
+- **Notion**, **Roam Research**, **Logseq**, **Capacities** — fertige Apps
+  mit Datenbank-Charakter
+- **Obsidian** + Markdown — lokal, vendor-frei, plugin-basiert
+- **Apple Notes**, **Google Keep**, einfache Notiz-Apps fuer Minimalisten
+- **Tana**, **Mem**, **Reflect** — KI-native Loesungen mit eingebauten LLMs
+- **Plain text** in einem Git-Repo — fuer Hardcore-Puristen
+- Hybrid-Setups die das alles kombinieren
+
+**Dieses Repo zeigt EINES dieser Setups.** Es ist nicht "die einzig wahre"
+Loesung — es ist die Loesung, die fuer mehrere KIs gleichzeitig optimiert ist
+und maschinenlesbar bleibt. Wenn dir ein anderer Ansatz besser passt: nimm
+den. Wichtiger als das Tool ist, dass du **ueberhaupt eines** baust und es
+regelmaessig pflegst.
+
+Was dieses Setup besonders macht, beschreibt der naechste Abschnitt.
+
+---
+
 ## Warum dieses Repo
 
 Wenn du zwei oder mehr KIs ernsthaft im Alltag nutzt, merkst du irgendwann:
@@ -304,7 +334,39 @@ Issue oeffnen, damit wir die Richtung abstimmen koennen.
 
 ## Inspiration & Quellen
 
-- [Andrej Karpathy — LLM-as-a-Wiki Gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
-- Tiago Forte — Building a Second Brain (Buch, 2022)
-- Michael Nygard — [Documenting Architecture Decisions (ADR)](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) (2011)
-- Vault-zentrische Skills inspiriert vom [OpenCLAW Bootstrap-Pattern](https://github.com/vibercoder79/KI-Masterclass-Koerting-/tree/main/bootstrap)
+Dieses Setup ist nicht aus dem Nichts entstanden — es baut auf mehreren Vorarbeiten auf, und hat zwei eigene Erweiterungen.
+
+**Ausgangspunkt — Obsidian-Vault mit PARA:**
+
+- **Tiago Forte — Building a Second Brain** (Buch, 2022) — das PARA-Konzept als
+  Skelett der Ordnerstruktur
+- **Julian Ivanov — [Obsidian Setup Tour (YouTube)](https://www.youtube.com/watch?v=NVUCQ-pzBn4)** —
+  konkrete Inspiration fuer die Praxis-Umsetzung der PARA-Methode in Obsidian.
+  Tobias' Setup orientiert sich strukturell an Julians Vault — mit Anpassungen
+  fuer die Multi-KI-Nutzung.
+
+**Schritt weiter — Maschinenlesbarkeit und Compound-Effekt:**
+
+- **Andrej Karpathy — [LLM-as-a-Wiki Gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** —
+  zweiter Layer: das Vault nicht nur als menschen-lesbares Notizsystem
+  betrachten, sondern als LLM-lesbares Wiki, das von KIs inkrementell gepflegt
+  wird. Karpathys Ingest/Query/Lint-Pattern hebt das Setup von einem reinen
+  Ablage-System zu einem aktiven Wissens-System.
+
+**Eigene Erweiterung — die zwei Pflege-Skills:**
+
+- **`/ingest`** — verarbeitet neue Notizen, setzt bidirektionale Wikilinks,
+  erweitert Synthese-Seiten. Implementiert Karpathys "Ingest"-Operation in der
+  Praxis.
+- **`/lint`** — woechentlicher Health-Check des Vaults, regeneriert die
+  `Index.md` als Vault-Cover. Implementiert Karpathys "Lint"-Operation, plus
+  Projekt-Compliance-Checks.
+
+Diese zwei Skills (siehe [`skills/`](skills/)) sind die Brueche zwischen einem
+**statischen Notizsystem** (was Julian und Forte beschreiben) und einem
+**lebendigen Wissens-Wiki** (was Karpathy postuliert).
+
+**Weitere Quellen:**
+
+- Michael Nygard — [Documenting Architecture Decisions (ADR)](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) (2011) — fuer den ADR-Workflow in Projekten
+- Vault-zentrische Skills inspiriert vom [OpenCLAW Bootstrap-Pattern](https://github.com/vibercoder79/KI-Masterclass-Koerting-/tree/main/bootstrap) — Bootstrap-Pattern fuer Code-Repos, hier adaptiert fuer Notizsysteme

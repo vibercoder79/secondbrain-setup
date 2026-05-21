@@ -36,6 +36,36 @@ the basics in 5 minutes.
 
 ---
 
+## What is a Second Brain anyway?
+
+The term comes from the book "Building a Second Brain" (Tiago Forte, 2022).
+The core idea: your brain is good at **having ideas** but bad at **retaining
+and connecting them**. A Second Brain is an external knowledge system —
+notes, structures, cross-references — that takes the memory burden off you.
+You dump thoughts in, sort them with structure, and find them again when you
+need them. Ideally, the knowledge compounds over time into more than the
+sum of its parts.
+
+There are **many ways** to build a Second Brain:
+
+- **Notion**, **Roam Research**, **Logseq**, **Capacities** — ready-made
+  database-style apps
+- **Obsidian** + Markdown — local, vendor-free, plugin-based
+- **Apple Notes**, **Google Keep**, plain notes apps for minimalists
+- **Tana**, **Mem**, **Reflect** — AI-native solutions with built-in LLMs
+- **Plain text** in a Git repo — for hardcore purists
+- Hybrid setups combining all of the above
+
+**This repo shows ONE of these setups.** It's not "the only true" solution —
+it's the solution optimized for using multiple AIs at the same time while
+staying machine-readable. If another approach fits you better: take that one.
+What matters more than the tool is that you **actually build one** and
+maintain it regularly.
+
+What makes this setup different is covered in the next section.
+
+---
+
 ## Why this repo
 
 If you use two or more AIs seriously, sooner or later you notice: your
@@ -308,7 +338,39 @@ so we can align on direction.
 
 ## Inspiration & sources
 
-- [Andrej Karpathy — LLM-as-a-Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
-- Tiago Forte — Building a Second Brain (book, 2022)
-- Michael Nygard — [Documenting Architecture Decisions (ADR)](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) (2011)
-- Vault-centric skills inspired by the [OpenCLAW Bootstrap pattern](https://github.com/vibercoder79/KI-Masterclass-Koerting-/tree/main/bootstrap)
+This setup didn't come out of nowhere — it builds on multiple prior works,
+and adds two extensions of its own.
+
+**Starting point — Obsidian vault with PARA:**
+
+- **Tiago Forte — Building a Second Brain** (book, 2022) — the PARA concept
+  as the skeleton of the folder structure
+- **Julian Ivanov — [Obsidian Setup Tour (YouTube)](https://www.youtube.com/watch?v=NVUCQ-pzBn4)** —
+  concrete inspiration for how to actually implement the PARA method in
+  Obsidian. This setup is structurally aligned with Julian's vault, with
+  adaptations for multi-AI use.
+
+**A step further — machine readability and compound effect:**
+
+- **Andrej Karpathy — [LLM-as-a-Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** —
+  second layer: don't just see the vault as a human-readable notes system,
+  but as an LLM-readable wiki that AIs maintain incrementally. Karpathy's
+  Ingest/Query/Lint pattern elevates the setup from a pure filing system to
+  an active knowledge system.
+
+**Own extension — the two maintenance skills:**
+
+- **`/ingest`** — processes new notes, sets bidirectional wikilinks, enriches
+  synthesis pages. Implements Karpathy's "Ingest" operation in practice.
+- **`/lint`** — weekly health check of the vault, regenerates `Index.md` as
+  the vault cover. Implements Karpathy's "Lint" operation plus project
+  compliance checks.
+
+These two skills (see [`skills/`](skills/)) are the bridge between a
+**static notes system** (what Julian and Forte describe) and a **living
+knowledge wiki** (what Karpathy postulates).
+
+**Other sources:**
+
+- Michael Nygard — [Documenting Architecture Decisions (ADR)](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) (2011) — for the ADR workflow in projects
+- Vault-centric skills inspired by the [OpenCLAW Bootstrap pattern](https://github.com/vibercoder79/KI-Masterclass-Koerting-/tree/main/bootstrap) — bootstrap pattern for code repos, adapted here for notes systems
