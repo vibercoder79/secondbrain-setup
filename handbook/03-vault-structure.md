@@ -252,6 +252,49 @@ Consistent naming matters because wikilinks depend on it. If you write
 `[[Project X]]` today and `[[project-x]]` tomorrow, you have two different
 targets.
 
+## Optional: Rainbow Folders (visual customization)
+
+You can give the eight PARA folders **different colors** in Obsidian's
+sidebar, so it's visually obvious which area you're working in. The setup
+uses the **AnuPpuccin** theme plus the **Style Settings** plugin.
+
+![Rainbow Folders in the sidebar](../diagramme/05-rainbow-folders-sidebar.png)
+
+### Setup in 3 steps
+
+![Rainbow Folders setup](../diagramme/06-rainbow-folders-setup.png)
+
+**Step 1: enable the Style Settings plugin**
+
+1. Obsidian → `Settings` → `Community Plugins`
+2. If "Restricted Mode" is on, switch it **off**
+3. `Browse` → search "Style Settings" → `Install` → `Enable`
+
+**Step 2: install the AnuPpuccin theme**
+
+1. Obsidian → `Settings` → `Appearance` → `Themes` → `Manage`
+2. `Browse` → search "AnuPpuccin" → `Install` → `Use`
+3. Source/docs: <https://github.com/AnubisNekhet/AnuPpuccin>
+
+**Step 3: set Rainbow Style to Full**
+
+1. Obsidian → `Settings` → `Style Settings` (left sidebar)
+2. Section `Workspace` → `Rainbow Folders`
+3. Set `Rainbow style` from `None` to `Full`
+
+Result: the eight PARA folders show in eight different colors in the sidebar.
+
+### Is this actually necessary?
+
+No. The setup works just as well with the default theme. But:
+
+- **Faster visual orientation** — you don't accidentally click into
+  `02 Projekte` when you meant `03 Bereiche`
+- **Lower cognitive load** — color is faster to process than text
+- **Taste** — it looks nice
+
+If the default theme is enough for you: skip it.
+
 ## Next chapter
 
 → [04 — Multi-AI setup: Claude, Gemini, Codex, Claude Desktop, Perplexity](04-multi-ai-setup.md)

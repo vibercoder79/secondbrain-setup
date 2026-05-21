@@ -190,8 +190,12 @@ Zusammenfassung des Tages vor.
 └── 07 Anhaenge/                 Bilder, PDFs
 ```
 
-> Screenshot vom fertigen Vault folgt — bis dahin: bau dir eines auf, dann
-> siehst du selber wie es aussieht.
+**Optional: Rainbow Folders.** Du kannst die acht PARA-Ordner in Obsidians
+Sidebar farblich unterscheiden — visuelle Orientierung auf einen Blick.
+Setup mit AnuPpuccin-Theme + Style-Settings-Plugin in
+[Kapitel 03 — Vault-Struktur](handbuch/03-vault-struktur.md#optional-rainbow-folders-visuelle-anpassung).
+
+![Rainbow Folders in der Sidebar](diagramme/05-rainbow-folders-sidebar.png)
 
 ---
 

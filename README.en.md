@@ -192,8 +192,12 @@ summary of the day.
 > Folder names stay in German because they are part of the convention — they
 > sort by action pressure and AIs find them via the rules in CLAUDE.md.
 
-> A screenshot of the finished vault follows — until then: build one, then
-> you'll see what it looks like.
+**Optional: Rainbow Folders.** You can give the eight PARA folders different
+colors in Obsidian's sidebar — visual orientation at a glance. Setup with the
+AnuPpuccin theme + the Style Settings plugin in
+[Chapter 03 — Vault structure](handbook/03-vault-structure.md#optional-rainbow-folders-visual-customization).
+
+![Rainbow Folders in the sidebar](diagramme/05-rainbow-folders-sidebar.png)
 
 ---
 
