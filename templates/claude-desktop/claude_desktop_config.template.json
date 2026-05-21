@@ -1,0 +1,32 @@
+{
+  "_comment": "Template-Config fuer Claude Desktop. Siehe README.md im gleichen Ordner fuer Setup-Anleitung. NIEMALS echte API-Keys im Klartext einsetzen — Platzhalter durch Werte aus Keychain/env-vars ersetzen.",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "~/Obsidian/SecondBrain/"
+      ]
+    },
+    "perplexity": {
+      "_comment": "Optional. Nur aktivieren wenn du Perplexity-Recherche in Claude Desktop brauchst. API-Key NICHT hier eintragen — siehe README.md.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@perplexity-ai/mcp-server"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE"
+      }
+    },
+    "sequential-thinking": {
+      "_comment": "Optional. Hilft bei langen Reasoning-Chains.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}
