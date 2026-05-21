@@ -132,6 +132,8 @@ Der Hub ist **Anzeige, nicht Speicher**. Die Daten leben in den Unterordnern
 
 ## Dataview-Aggregation — der Trick
 
+![PMO HUB und Dataview-Aggregation](../diagramme/07-projekt-struktur-aggregation.png)
+
 Das ist das Herzstueck. Statt im Hub manuell Listen zu pflegen, ziehen
 **Dataview-Queries** Daten live aus den Unterordnern:
 
@@ -286,6 +288,8 @@ financials_url: —
   oder leere Governance ist ein Compliance-Verstoss
 
 ## Wie immer dieselbe Struktur entsteht
+
+![Drei Mechanismen — Methodik, Templates, Skill](../diagramme/08-projekt-mechanismen.png)
 
 Drei Mechanismen sorgen dafuer dass Projekte ueberall gleich aussehen:
 

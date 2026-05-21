@@ -133,6 +133,8 @@ The hub is **display, not storage**. The data lives in the sub-folders
 
 ## Dataview aggregation — the trick
 
+![PMO HUB and Dataview aggregation](../diagramme/07-projekt-struktur-aggregation.png)
+
 This is the heart of the setup. Instead of manually maintaining lists in
 the hub, **Dataview queries** pull data live from the sub-folders:
 
@@ -287,6 +289,8 @@ financials_url: —
   or empty governance is a compliance violation
 
 ## How the same structure emerges every time
+
+![Three mechanisms — methodology, templates, skill](../diagramme/08-projekt-mechanismen.png)
 
 Three mechanisms ensure that projects look the same everywhere:
 
