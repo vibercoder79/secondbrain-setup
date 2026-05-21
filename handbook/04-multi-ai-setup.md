@@ -103,6 +103,60 @@ To keep Gemini sessions discoverable in the vault, there is a convention:
 The pattern is documented in GEMINI.md itself — Gemini reads the file on start
 and knows the rule.
 
+### Example: what the real `GEMINI.md` looks like
+
+Vault-structure-relevant excerpts from the config in production use (sanitized
+to `~/` paths):
+
+````markdown
+# Globale Regeln
+
+## Sprache
+Alle Kommunikation und Dokumentation auf Deutsch.
+
+## Zweites Gehirn (SecondBrain)
+
+Projektuebergreifendes Wissenssystem unter `~/Obsidian/SecondBrain/`.
+
+Die massgeblichen Regeln, Routinen und Pfade fuer das SecondBrain stehen in der
+Vault-eigenen Regel-Datei und werden hier direkt eingebunden — diese Datei ist
+die Single Source of Truth fuer alle KIs (Claude, Gemini, ...):
+
+@~/Obsidian/SecondBrain/CLAUDE.md
+
+Hinweis: Der Dateiname `CLAUDE.md` ist historisch — der Inhalt ist KI-agnostisch
+und gilt ebenso fuer Gemini.
+
+## Chat-Archivierung (Gemini-spezifisch)
+
+**Default-Speicherort:** `~/Obsidian/SecondBrain/04 Ressourcen/Gemini/`
+
+**Trigger:**
+- Bei Session-Ende proaktiv anbieten (analog zum Daily-Note-Angebot)
+- Auf Zuruf bei "speicher das" / "archivier den Chat"
+- NICHT nach jeder einzelnen Nachricht
+
+**Naming:** `YYYY-MM-DD-HHMM-kurzthema.md`
+
+**Frontmatter:**
+```yaml
+---
+tags: [gemini-chat]
+datum: YYYY-MM-DD
+thema: kurzbeschreibung
+---
+```
+
+**Wann NICHT in dieses Verzeichnis speichern:**
+- Wenn die Session zu einem laufenden Projekt gehoert → `02 Projekte/<projekt>/`
+- Bei Deep Research → `04 Ressourcen/Research/`
+- Bei Meeting-Verarbeitung → Decisions/Risks/Backlog
+````
+
+The rest of the real `GEMINI.md` contains personal working rules, a secrets
+policy and a few more AI-agnostic defaults — those are not vault-specific and
+were omitted here.
+
 ## Codex CLI (OpenAI)
 
 OpenAI Codex CLI has been OpenAI's official coding CLI since early 2026.
@@ -144,6 +198,75 @@ codex
 ```
 
 In the Codex chat: *"What's in my inbox?"* — Codex should read `01 Inbox/`.
+
+### Example: what the real `AGENTS.md` looks like
+
+Vault-structure-relevant excerpts from the config in production use. What
+stands out for Codex: an explicit **fallback** in case `@-import` doesn't work,
+plus **quick rules in plaintext** in case the vault file wasn't loaded:
+
+````markdown
+## Zweites Gehirn (SecondBrain)
+
+Projektuebergreifendes Wissenssystem unter `~/Obsidian/SecondBrain/`.
+
+Die massgeblichen Regeln, Routinen und Pfade stehen in der Vault-eigenen
+Regel-Datei. Diese Datei ist die Single Source of Truth fuer alle KIs:
+
+@~/Obsidian/SecondBrain/CLAUDE.md
+
+**WICHTIG:** Falls Codex die `@-Import`-Syntax nicht unterstuetzt, lies die Datei
+explizit beim ersten Schritt jeder Session mit dem Read- oder Bash-Tool und
+befolge ihre Anweisungen. Pfad: `~/Obsidian/SecondBrain/CLAUDE.md`
+
+### Schnell-Regeln (fuer den Fall dass Datei nicht geladen wurde)
+
+- **Inbox pruefen** bei Session-Start (`01 Inbox/`) und neue Notizen anbieten einzusortieren
+- **Daily Note schreiben** bei Session-Ende anbieten (`05 Daily Notes/YYYY-MM-DD.md`)
+- **Projekte anlegen** nach Methodik in `00 Kontext/Workflows/Projekt-Anlegen.md`
+  — diese Datei IMMER lesen, bevor du ein Projekt anlegst
+- **Frontmatter-Pflicht:** Jede neue Datei bekommt `source: codex-cli` und
+  `chat_url: unbekannt`
+- **Daily-Note-Sektion:** Eigenen Abschnitt mit
+  `> [!info] Via Codex — chat_url: unbekannt` markieren
+- **Wikilinks** verwenden fuer Verknuepfungen, nicht volle Pfade
+- **Datei erst lesen, dann aendern** — bestehende Dateien editieren statt neue
+  zu erstellen
+
+## Chat-Archivierung (Codex-spezifisch)
+
+**Default-Speicherort:** `~/Obsidian/SecondBrain/04 Ressourcen/Codex - OpenAI/`
+
+**Naming:** `YYYY-MM-DD-HHMM-kurzthema.md`
+
+**Frontmatter:**
+```yaml
+---
+tags: [codex-chat]
+datum: YYYY-MM-DD
+thema: kurzbeschreibung
+source: codex-cli
+chat_url: unbekannt
+---
+```
+
+## Projekt-Anlage
+
+Wenn der Nutzer sagt *"lege ein Projekt an"*, *"neues Projekt"* oder aehnliches:
+
+1. **ZUERST** `00 Kontext/Workflows/Projekt-Anlegen.md` lesen
+2. Den dort definierten 10-Fragen-Block als **eine** Message stellen
+3. Anschliessend den Phasen-Workflow manuell durchfahren
+
+Die Methodik ist KI-agnostisch — Codex nutzt sie genauso wie Claude. Unterschied:
+Codex faehrt den Workflow manuell mit Bash/Write-Tools nach, ohne die
+Skill-Automation von Claude.
+````
+
+The decisive trick is the **fallback path**: not all CLI versions support
+`@-import` reliably, which is why the config additionally has an explicit
+read instruction — and the most important vault rules as a plaintext block,
+so that even without a loaded vault file the minimum still works.
 
 ## Claude Desktop
 

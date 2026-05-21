@@ -263,16 +263,17 @@ Alle Diagramme als Excalidraw-Quelle in [`diagramme/`](diagramme/).
 
 ## Handbuch
 
-Sieben Kapitel, jeweils 5-15 Minuten Lesedauer:
+Acht Kapitel plus Vorab-Kapitel, jeweils 5-15 Minuten Lesedauer:
 
 0. [Vorab — Was du vorher wissen solltest](handbuch/00-vorab.md) *(fuer Beginner)*
 1. [Philosophie — Warum dieses Setup existiert](handbuch/01-philosophie.md)
 2. [Architektur — Hub-and-Spoke und das Drei-Ebenen-Modell](handbuch/02-architektur.md)
 3. [Vault-Struktur — PARA in Praxis](handbuch/03-vault-struktur.md)
-4. [Multi-KI-Setup — Claude, Gemini, Codex, Claude Desktop, Perplexity](handbuch/04-multi-ki-setup.md)
+4. [Multi-KI-Setup — Claude, Gemini, Codex, Claude Desktop, Perplexity](handbuch/04-multi-ki-setup.md) *(mit echten Config-Snippets)*
 5. [Workflows — Daily Notes, Projekte, Deep Research, Ingest, Lint](handbuch/05-workflows.md)
 6. [Skills — projekt-init, lint, ingest im Detail](handbuch/06-skills.md)
 7. [Anpassen — Eigene Pfade, eigene Tools, Migration](handbuch/07-anpassen.md)
+8. [Projektmanagement — Hub, Governance, Dataview-Aggregation](handbuch/08-projektmanagement.md) *(Vertiefung)*
 
 Plus: [Glossar](GLOSSAR.md) mit allen Fachbegriffen.
 
