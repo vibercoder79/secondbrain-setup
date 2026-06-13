@@ -274,6 +274,7 @@ Acht Kapitel plus Vorab-Kapitel, jeweils 5-15 Minuten Lesedauer:
 6. [Skills — projekt-init, lint, ingest im Detail](handbuch/06-skills.md)
 7. [Anpassen — Eigene Pfade, eigene Tools, Migration](handbuch/07-anpassen.md)
 8. [Projektmanagement — Hub, Governance, Dataview-Aggregation](handbuch/08-projektmanagement.md) *(Vertiefung)*
+9. [Kuratierung — synthesize, decay, prune im Detail](handbuch/09-kuratierung.md) *(Zwei-Schichten-Modell, drei neue Skills)*
 
 Plus: [Glossar](GLOSSAR.md) mit allen Fachbegriffen.
 
@@ -294,7 +295,7 @@ secondbrain-setup/
 │   ├── claude-desktop/             Claude Desktop Config + README
 │   ├── vault/                      Vault-Inhalte (CLAUDE.md, AGENTS.md, 00 Kontext)
 │   └── projekt/                    Projekt-Templates (PMO HUB, Governance, ADR, Meeting)
-├── skills/                         Drei Skills: projekt-init, lint, ingest
+├── skills/                         Sechs Skills: projekt-init, lint, ingest, synthesize, decay, prune
 ├── diagramme/                      Excalidraw + PNG (DE + EN)
 └── setup.sh                        Interaktiver Setup-Helfer
 ```
@@ -354,7 +355,7 @@ Dieses Setup ist nicht aus dem Nichts entstanden — es baut auf mehreren Vorarb
   wird. Karpathys Ingest/Query/Lint-Pattern hebt das Setup von einem reinen
   Ablage-System zu einem aktiven Wissens-System.
 
-**Eigene Erweiterung — die zwei Pflege-Skills:**
+**Eigene Erweiterung 1 — die zwei Pflege-Skills:**
 
 - **`/ingest`** — verarbeitet neue Notizen, setzt bidirektionale Wikilinks,
   erweitert Synthese-Seiten. Implementiert Karpathys "Ingest"-Operation in der
@@ -366,6 +367,26 @@ Dieses Setup ist nicht aus dem Nichts entstanden — es baut auf mehreren Vorarb
 Diese zwei Skills (siehe [`skills/`](skills/)) sind die Brueche zwischen einem
 **statischen Notizsystem** (was Julian und Forte beschreiben) und einem
 **lebendigen Wissens-Wiki** (was Karpathy postuliert).
+
+**Eigene Erweiterung 2 — die drei Kuratierungs-Skills:**
+
+Karpathys Trias (Ingest, Query, Lint) deckt das Reinkommen, das Abfragen und
+die Hygiene ab. Drei Disziplinen bleiben offen: Verdichten, Altern lassen,
+Aussortieren. Genau dafuer sind diese drei Skills da:
+
+- **`/synthesize`** — verdichtet Notizen eines Themen-Clusters zu einer
+  Synthese-Seite oder MOC. Hebt Roh-Material in die kuratierte Schicht.
+- **`/decay`** — prueft Notizen aelter als eine Schwelle auf Veraltung,
+  validiert pruefbare Aussagen gegen das Web, markiert `freshness` in der
+  Frontmatter.
+- **`/prune`** — schlaegt Loesch-Kandidaten vor (Duplikate, alte Orphans,
+  ungenutzte Brain Dumps, veraltete Notizen). Kein Auto-Delete, jede
+  Entscheidung einzeln bestaetigt.
+
+Hintergrund und Zwei-Schichten-Architektur in
+[Kapitel 09 — Kuratierung](handbuch/09-kuratierung.md). Zusammen mit den ersten
+drei Skills ergeben sie die sechs Operationen, die ein Vault braucht, um nicht
+nur lebendig, sondern auch kuratiert zu bleiben.
 
 **Weitere Quellen:**
 

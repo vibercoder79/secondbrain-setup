@@ -277,6 +277,7 @@ Eight chapters plus a prerequisites chapter, 5-15 minutes each:
 6. [Skills — projekt-init, lint, ingest in detail](handbook/06-skills.md)
 7. [Customizing — Your own paths, your own tools, migration](handbook/07-customizing.md)
 8. [Project management — Hub, governance, Dataview aggregation](handbook/08-project-management.md) *(deep dive)*
+9. [Curation — synthesize, decay, prune in detail](handbook/09-curation.md) *(two-layer model, three new skills)*
 
 Plus: [Glossary](GLOSSARY.md) with all technical terms.
 
@@ -297,7 +298,7 @@ secondbrain-setup/
 │   ├── claude-desktop/             Claude Desktop config + README
 │   ├── vault/                      Vault content (CLAUDE.md, AGENTS.md, 00 Kontext)
 │   └── projekt/                    Project templates (PMO HUB, Governance, ADR, Meeting)
-├── skills/                         Three skills: projekt-init, lint, ingest
+├── skills/                         Six skills: projekt-init, lint, ingest, synthesize, decay, prune
 ├── diagramme/                      Excalidraw + PNG (DE + EN)
 └── setup.sh                        Interactive setup helper
 ```
@@ -359,7 +360,7 @@ and adds two extensions of its own.
   Ingest/Query/Lint pattern elevates the setup from a pure filing system to
   an active knowledge system.
 
-**Own extension — the two maintenance skills:**
+**Own extension 1 — the two maintenance skills:**
 
 - **`/ingest`** — processes new notes, sets bidirectional wikilinks, enriches
   synthesis pages. Implements Karpathy's "Ingest" operation in practice.
@@ -370,6 +371,25 @@ and adds two extensions of its own.
 These two skills (see [`skills/`](skills/)) are the bridge between a
 **static notes system** (what Julian and Forte describe) and a **living
 knowledge wiki** (what Karpathy postulates).
+
+**Own extension 2 — the three curation skills:**
+
+Karpathy's triad (Ingest, Query, Lint) covers intake, retrieval and hygiene.
+Three disciplines stay open: condensing, aging, sorting out. The three new
+skills close exactly that gap:
+
+- **`/synthesize`** — condenses notes of a topic cluster into a synthesis
+  note or MOC. Lifts raw material into the curated layer.
+- **`/decay`** — checks notes older than a threshold for aging, validates
+  checkable claims against the web, marks `freshness` in the frontmatter.
+- **`/prune`** — suggests deletion candidates (duplicates, stale orphans,
+  unused brain dumps, outdated notes). No auto-delete, every decision
+  confirmed individually.
+
+Background and the two-layer architecture in
+[Chapter 09 — Curation](handbook/09-curation.md). Together with the first
+three skills, they form the six operations a vault needs to stay not just
+alive, but curated.
 
 **Other sources:**
 
