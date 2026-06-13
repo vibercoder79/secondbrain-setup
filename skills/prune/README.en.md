@@ -11,7 +11,7 @@ Part of the curation pattern with `/lint` (diagnose), `/synthesize` (condense),
 
 ## Version
 
-**v1.0.0** (June 2026) — Initial release.
+**v1.0.1** (June 2026) — Scan mode added for routine-driven runs.
 
 ## Installation
 
@@ -34,6 +34,57 @@ Check:
 | `/prune orphans` | Persistent orphans only (three lint runs) |
 | `/prune inbox` | Old brain dumps in `01 Inbox/` only |
 | `/prune stale` | `freshness: veraltet` notes only |
+| `/prune scan-only` | Scan mode, writes proposal list only, no actions |
+| `/prune scan-only category:duplicates` | Scan mode, duplicates only |
+| `/prune scan-only category:orphans` | Scan mode, orphans only |
+| `/prune scan-only category:brain-dumps` | Scan mode, old brain dumps only |
+| `/prune scan-only category:decayed` | Scan mode, stale notes only |
+
+## Modes
+
+| Mode | Trigger | Effect | Routine-safe |
+|------|---------|--------|--------------|
+| Full mode (default) | manual | per-item confirmation, real deletes and archives | no (interactive) |
+| Scan mode (`scan-only`) | manual or routine | proposal list as scan report, NO actions | yes (autonomous) |
+
+Scan is the sensor, the full run stays strictly manual. Deletes and archives must
+never be automatable. Scan produces the picture, the user makes every decision in
+the full run.
+
+### Example: scan run
+
+```
+/prune scan-only
+```
+
+Sample output (truncated):
+
+```markdown
+# Prune Scan — 2026-06-13
+
+- Run date: 2026-06-13
+- Scope: all
+- Total candidates: 12
+
+## Duplicates
+
+| Path A | Path B | Similarity | Reason | Recommendation |
+|--------|--------|------------|--------|----------------|
+| 04 Ressourcen/.../Setup Web Clipper.md | 01 Inbox/Setup Web Clipper.md | 0.82 | newer, fewer backlinks | delete |
+
+## Old brain dumps
+
+| Path | Reason | Recommendation |
+|------|--------|----------------|
+| 01 Inbox/Gedanke RAG vs. Wiki.md | 13 months, no backlinks | archive |
+
+---
+
+Next step: run `/prune` manually and work through per-item confirmation.
+```
+
+No files are deleted or moved. The scan report lives at
+`03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Prune Scan.md`.
 
 ## Categories
 
@@ -65,6 +116,9 @@ old. Recommendation: always archive.
 3. **When in doubt: archive instead of delete.**
 4. **Protected zones:** `00 Kontext/`, `CLAUDE.md`, `log.md`, `Index.md`,
    `03 Bereiche/Skills/`, `07 Anhaenge/`, daily notes.
+5. **Scan mode is the only automatable variant.** Deletion and archival stay
+   strictly interactive. A routine may run `/prune scan-only`, never `/prune`.
+   That guarantees no routine run can ever touch files.
 
 ## Workflow
 
@@ -117,3 +171,4 @@ prune/
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-06-13 | Initial release: 4-category workflow with per-item confirmation |
+| 1.0.1 | 2026-06-13 | Scan mode added for routine-driven runs (autonomous, no rm/mv). Full mode unchanged. |

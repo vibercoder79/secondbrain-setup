@@ -10,7 +10,7 @@ German version: [README.md](README.md)
 
 ## Version
 
-**v1.0.0** (June 2026) — see [Version history](#version-history)
+**v1.0.1** (June 2026) — see [Version history](#version-history)
 
 ## Installation
 
@@ -33,8 +33,32 @@ Quick check:
 | `/decay folder:"03 Bereiche"` | Switch scope folder |
 | `/decay older-than:3m folder:"02 Projekte"` | Combine arguments |
 | `/decay note:"NoteName"` | Check a single note regardless of age |
+| `/decay scan-only` | Scan mode: only write the scan report, no frontmatter writes, autonomous (no confirmation dialog). Combinable with `older-than:` and `folder:`. |
 
 Other triggers (German): `decay`, `decay check`, `ist das noch aktuell`, `pruefe alte notizen`, `freshness check`, `wissens-altern`.
+
+## Modes
+
+| Mode | Trigger | Effect | Routine-safe |
+|------|---------|--------|--------------|
+| Full mode (default) | manual | scan, validate, write frontmatter with confirmation, report | no (interactive) |
+| Scan mode (`scan-only`) | manual or routine | scan, validate, write only scan report, no frontmatter | yes (autonomous) |
+
+**Role split:** Scan mode is the sensor — it runs autonomously in routines (scheduled agents), produces a scan report and writes nothing to source notes. Full mode is the action — it is triggered manually after the user has reviewed a scan report and writes the classification into frontmatter with confirmation.
+
+### Examples
+
+`/decay`
+- Full mode, defaults (6 months, `04 Ressourcen`)
+- Output: preview table, confirmation dialog, frontmatter updates in source notes, report `YYYY-MM-DD Decay Report.md`, log entry with prefix `decay`
+
+`/decay scan-only`
+- Scan mode, defaults (6 months, `04 Ressourcen`)
+- Output: only the scan report `YYYY-MM-DD Decay Scan.md`, log entry with prefix `decay-scan`. No changes to source notes, no questions. Suited as a sensor inside scheduled agents.
+
+`/decay scan-only older-than:12m folder:"03 Bereiche"`
+- Scan mode with adjusted scope (12 months, `03 Bereiche`)
+- Output: same as above, just wider scope
 
 ## What the skill does (8 phases)
 
@@ -49,8 +73,10 @@ Other triggers (German): `decay`, `decay check`, `ist das noch aktuell`, `pruefe
    decay_checked_at: 2026-06-13
    decay_notes: short reason if needed
    ```
-7. **Decay report** — Markdown in `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Decay Report.md`.
-8. **Log entry** — Append-only in `log.md`.
+7. **Decay report** — Markdown in `03 Bereiche/Vault-Gesundheit/`. Filename depends on mode:
+   - Full mode: `YYYY-MM-DD Decay Report.md`
+   - Scan mode: `YYYY-MM-DD Decay Scan.md`
+8. **Log entry** — Append-only in `log.md`. Prefix `decay` in full mode, `decay-scan` in scan mode.
 
 ## Why this skill?
 
@@ -88,14 +114,15 @@ Together these three make up the curation set for the SecondBrain.
 
 ## Rules
 
-1. **ALWAYS preview before writing** — frontmatter is never set without confirmation
-2. **NEVER change content** — decay only marks
-3. **NEVER delete or archive** — mitigation is a suggestion
-4. **Web calls sparingly** — max 3 per note, bundle across notes
-5. **Respect hard excludes** — daily notes, archive, inbox, context, attachments never checked
-6. **Reason required** for `ueberpruefen` and `veraltet`
-7. **Log is append-only** — never modify existing entries
-8. **Language: German default** for output and report
+1. **ALWAYS preview before writing in full mode** — frontmatter is never set without confirmation
+2. **Scan mode never writes to source notes** — only scan report and log entry
+3. **NEVER change content** — decay only marks
+4. **NEVER delete or archive** — mitigation is a suggestion
+5. **Web calls sparingly** — max 3 per note, bundle across notes
+6. **Respect hard excludes** — daily notes, archive, inbox, context, attachments never checked
+7. **Reason required** for `ueberpruefen` and `veraltet` (full mode only)
+8. **Log is append-only** — never modify existing entries; prefix `decay` in full mode, `decay-scan` in scan mode
+9. **Language: German default** for output and report
 
 ## File structure
 
@@ -121,4 +148,5 @@ decay/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.1 | 2026-06-13 | Scan mode added for routine triggering (autonomous, no frontmatter writes) |
 | 1.0.0 | 2026-06-13 | Initial release: 8-phase workflow with web validation, frontmatter marking, report in Vault-Gesundheit/ |

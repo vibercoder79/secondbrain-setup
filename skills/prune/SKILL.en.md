@@ -5,7 +5,7 @@ description: >
   unused brain dumps, stale notes) and proposes deletion or archival. Strict per-item
   confirmation, no auto-delete. Use when the user says "prune", "deletion suggestions",
   "clean up the vault", "sort out", "find duplicates", "clear old orphans".
-version: 1.0.0
+version: 1.0.1
 user-invocable: true
 allowed-tools:
   - Read
@@ -63,10 +63,101 @@ Quarterly cadence. Complement to `/lint` (diagnose), `/decay` (mark freshness) a
 | `/prune orphans` | Persistent orphans only |
 | `/prune inbox` | Old brain dumps in `01 Inbox/` only |
 | `/prune stale` | Notes with `freshness: veraltet` only |
+| `/prune scan-only` | Pure scan, writes proposal list only, no actions |
+| `/prune scan-only category:duplicates` | Scan mode, duplicates only |
+| `/prune scan-only category:orphans` | Scan mode, orphans only |
+| `/prune scan-only category:brain-dumps` | Scan mode, old brain dumps only |
+| `/prune scan-only category:decayed` | Scan mode, stale notes only |
 
 If nothing is specified, ask via AskUserQuestion before the run.
 
-## Workflow
+## Modes
+
+| Mode | Trigger | Effect | Routine-safe |
+|------|---------|--------|--------------|
+| Full mode (default) | manual | per-item confirmation, real deletes and archives | no (interactive) |
+| Scan mode (`scan-only`) | manual or routine | proposal list as scan report, NO actions | yes (autonomous) |
+
+Scan is the sensor, the full run stays strictly manual. Deletes and archives must
+never be automatable. Scan produces the picture, the user makes every decision in
+the interactive full run.
+
+## Scan mode workflow (`scan-only`)
+
+When the invocation includes `scan-only`, follow this shortened, non-interactive path:
+
+1. **Derive scope without prompting.** Default: all four categories. If a
+   `category:<name>` filter is provided (`duplicates`, `orphans`, `brain-dumps`,
+   `decayed`), restrict to that category.
+2. **Skip the backup check.** No actions are taken, so no risk.
+3. **Collect candidates as in full mode** (Step 2 below). Same heuristics, same
+   protected zones, same recommendation rules.
+4. **Write the scan report** to
+   `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Prune Scan.md` (filename uses "Scan"
+   instead of "Log" so it is clearly distinguishable from interactive runs).
+5. **No `rm`, no `mv`.** No `AskUserQuestion`.
+6. **Log entry in `log.md`** uses the prefix `prune-scan` instead of `prune`.
+
+Scan report format:
+
+```markdown
+---
+tags: [system, prune-scan]
+date: YYYY-MM-DD
+scope: <all | duplicates | orphans | brain-dumps | decayed>
+source: claude
+chat_url: <if known, else unknown>
+---
+
+# Prune Scan — YYYY-MM-DD
+
+- Run date: YYYY-MM-DD
+- Scope: <all | duplicates only | ...>
+- Total candidates: N
+
+## Duplicates
+
+| Path A | Path B | Similarity | Reason | Recommendation |
+|--------|--------|------------|--------|----------------|
+| ... | ... | 0.82 | newer, fewer backlinks | delete |
+
+## Persistent orphans
+
+| Path | Reason | Recommendation |
+|------|--------|----------------|
+| ... | 3/3 lint runs, 47 words | delete |
+
+## Old brain dumps
+
+| Path | Reason | Recommendation |
+|------|--------|----------------|
+| ... | 13 months, no backlinks | archive |
+
+## Stale notes
+
+| Path | Reason | Recommendation |
+|------|--------|----------------|
+| ... | freshness: veraltet, last update 5 months ago | archive |
+
+---
+
+Next step: run `/prune` manually and work through per-item confirmation.
+```
+
+Append entry to `log.md`:
+
+```markdown
+## [YYYY-MM-DD] prune-scan | Scan run (autonomous)
+
+- **Scope:** <all | duplicates only | ...>
+- **Candidates:** N
+- **Report:** [[YYYY-MM-DD Prune Scan]]
+- **Note:** No actions taken. Next step: `/prune` manually.
+```
+
+This ends the scan mode. Steps 3 through 7 of the full mode are skipped.
+
+## Full mode workflow
 
 ### Step 1: Choose scope
 

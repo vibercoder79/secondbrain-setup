@@ -174,9 +174,11 @@ Skill-Quelle: [`../skills/synthesize/`](../skills/synthesize/).
 
 ### `decay` — Veraltung markieren
 
+**Modi:** Voll-Modus + Scan-Modus (v1.0.1).
+
 **Trigger:** `/decay`, `/decay older-than:12m folder:"03 Bereiche"`,
-`/decay note:"<Notiz>"`, oder Saetze wie "decay check", "ist das noch aktuell",
-"pruefe alte notizen", "freshness check".
+`/decay scan-only`, `/decay note:"<Notiz>"`, oder Saetze wie "decay check",
+"ist das noch aktuell", "pruefe alte notizen", "freshness check".
 
 **Was er tut**
 
@@ -216,9 +218,11 @@ Skill-Quelle: [`../skills/decay/`](../skills/decay/).
 
 ### `prune` — Aussortieren
 
-**Trigger:** `/prune`, `/prune duplikate`, `/prune orphans`, `/prune inbox`,
-`/prune veraltet`, oder Saetze wie "prune", "loesch-vorschlaege", "vault
-entruempeln", "duplikate finden", "alte orphans aufraeumen".
+**Modi:** Voll-Modus + Scan-Modus (v1.0.1).
+
+**Trigger:** `/prune`, `/prune scan-only`, `/prune duplikate`, `/prune orphans`,
+`/prune inbox`, `/prune veraltet`, oder Saetze wie "prune", "loesch-vorschlaege",
+"vault entruempeln", "duplikate finden", "alte orphans aufraeumen".
 
 **Was er tut**
 
@@ -344,6 +348,78 @@ treffen kann.
   vorausgesetzt ist.
 - [`../skills/README.md`](../skills/README.md) listet alle sechs Skills mit
   Installationsbefehlen.
+
+## Skills und Routinen — wer macht was?
+
+Skills definieren das Was, Routinen das Wann. Ein Skill ist die Logik mit den
+Schritten und Tool-Aufrufen. Eine Routine (Scheduled Agent) ist nur der
+Ausloesezeitpunkt. Routinen rufen Skills auf. Beides ist komplementaer, kein
+Entweder-Oder.
+
+### Skill und Routine im Vergleich
+
+| | Skill | Routine (Scheduled Agent) |
+| --- | --- | --- |
+| Funktion | Workflow (Logik, Schritte, Tool-Aufrufe) | Ausloesung (Zeitpunkt, Frequenz) |
+| Wo laeuft es | Lokal auf deinem Mac in Claude Code | Serverseitig (Anthropic-Routine) oder lokaler Cron |
+| Mac muss laufen | ja | nein bei Anthropic-Routine |
+| Interaktion | ja, mit Confirmation | nein, autonom |
+| Beispiel | `/synthesize cluster:"04 Ressourcen/KI"` | Sonntag 20 Uhr `/lint` ausfuehren |
+
+### Was passt zu welchem Skill?
+
+| Skill | Manuell | Routine-tauglich | Wann Routine sinnvoll |
+| --- | --- | --- | --- |
+| `/projekt-init` | ja | nein | nur bei expliziter Projekt-Anlage |
+| `/ingest` | ja | nein | pro Notiz interaktiv |
+| `/lint` | ja | **ja** | woechentlich autonom |
+| `/lint index` | ja | **ja** | taeglich autonom |
+| `/synthesize` | ja | nein | Verdichtung ist kreativ, immer manuell |
+| `/decay scan-only` | ja | **ja** | monatlich autonom als Sensor |
+| `/decay` (Voll) | ja | nein | Folge-Lauf manuell nach Scan-Report |
+| `/prune scan-only` | ja | **ja** | quartalsweise autonom als Sensor |
+| `/prune` (Voll) | ja | nein | Loeschung immer manuell mit Einzel-Confirmation |
+
+### Pattern: Routine erkennt, Skill entscheidet
+
+Routinen sind Sensoren. Sie laufen autonom, scannen das Vault und schreiben
+einen Report. Sie veraendern nichts Inhaltliches. Der Mensch entscheidet im
+Folge-Lauf, was tatsaechlich passiert. Das ist der Trick: das Erkennen wird
+billig und regelmaessig, das Entscheiden bleibt teuer und bewusst.
+
+### Routinen einrichten
+
+Die folgenden vier Prompts kannst du direkt in Claude Code eingeben. Sie legen
+serverseitige Routinen an, die den Vault per MCP erreichen. Der Mac muss dafuer
+nicht laufen. Reports landen im Vault unter `03 Bereiche/Vault-Gesundheit/` und
+werden beim naechsten Session-Start von Claude automatisch gelesen.
+
+```
+Prompt 1 - taeglicher Index-Refresh:
+/schedule "lint-index-daily" cron:"0 8 * * *" prompt:"/lint index"
+
+Prompt 2 - woechentlicher Voll-Lint mit Report:
+/schedule "lint-weekly" cron:"0 20 * * 0" prompt:"/lint"
+
+Prompt 3 - monatlicher Decay-Scan:
+/schedule "decay-scan-monthly" cron:"0 9 1 * *" prompt:"/decay scan-only folder:\"04 Ressourcen\" older-than:6m"
+
+Prompt 4 - quartalsweiser Prune-Scan:
+/schedule "prune-scan-quarterly" cron:"0 9 1 1,4,7,10 *" prompt:"/prune scan-only"
+```
+
+Voraussetzung: das Vault muss per MCP an die Routine angeschlossen sein. Der
+Scan-Modus schreibt nur Reports (`YYYY-MM-DD Decay Scan.md` und
+`YYYY-MM-DD Prune Scan.md`), keine Frontmatter, keine Loeschungen. Der Folge-Lauf
+im Voll-Modus passiert manuell, mit Einzel-Confirmation.
+
+### Sicherheits-Anker
+
+Manche Skills sind absichtlich nicht Routine-tauglich. `/synthesize` weil
+Verdichtung kreativ ist und das eigene Denken nicht delegierbar. Der Voll-Modus
+von `/prune` weil Loeschungen niemals autonomisierbar sein duerfen, auch nicht
+mit schoenem Logging. Diese Linie ist bewusst gezogen, nicht eine technische
+Einschraenkung. Routinen erkennen, der Mensch entscheidet.
 
 ## Naechstes Kapitel
 

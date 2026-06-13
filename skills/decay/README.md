@@ -8,7 +8,7 @@ Findet alte Notizen im SecondBrain, prueft pruefbare Aussagen gegen die aktuelle
 
 ## Version
 
-**v1.0.0** (Juni 2026) — siehe [Versionshistorie](#versionshistorie)
+**v1.0.1** (Juni 2026) — siehe [Versionshistorie](#versionshistorie)
 
 ## Installation
 
@@ -31,8 +31,32 @@ Pruefen ob es funktioniert:
 | `/decay folder:"03 Bereiche"` | Anderen Scope-Ordner waehlen |
 | `/decay older-than:3m folder:"02 Projekte"` | Kombinierbare Argumente |
 | `/decay note:"Notizname"` | Einzelne Notiz pruefen, unabhaengig vom Alter |
+| `/decay scan-only` | Scan-Modus: nur Scan-Report schreiben, keine Frontmatter-Aenderungen, autonom (kein Confirmation-Dialog). Kombinierbar mit `older-than:` und `folder:`. |
 
 Weitere Ausloeser: `decay`, `decay check`, `ist das noch aktuell`, `pruefe alte notizen`, `freshness check`, `wissens-altern`.
+
+## Modi
+
+| Modus | Ausloesung | Wirkung | Routine-tauglich |
+|-------|------------|---------|------------------|
+| Voll-Modus (Default) | manuell | scannt, validiert, schreibt Frontmatter mit Confirmation, Report | nein (interaktiv) |
+| Scan-Modus (`scan-only`) | manuell oder Routine | scannt, validiert, schreibt nur Scan-Report, kein Frontmatter | ja (autonom) |
+
+**Rollenteilung:** Der Scan-Modus ist der Sensor — er laeuft autonom in Routinen (Scheduled Agents), liefert einen Scan-Report und schreibt nichts in die Quell-Notizen. Der Voll-Modus ist die Aktion — er wird manuell ausgeloest, nachdem der Nutzer einen Scan-Report gesichtet hat, und schreibt die Klassifikation in die Frontmatter.
+
+### Beispiele
+
+`/decay`
+- Voll-Modus, Defaults (6 Monate, `04 Ressourcen`)
+- Output: Preview-Tabelle, Confirmation-Dialog, Frontmatter-Updates in Quell-Notizen, Report `YYYY-MM-DD Decay Report.md`, Log-Eintrag mit Praefix `decay`
+
+`/decay scan-only`
+- Scan-Modus, Defaults (6 Monate, `04 Ressourcen`)
+- Output: nur Scan-Report `YYYY-MM-DD Decay Scan.md`, Log-Eintrag mit Praefix `decay-scan`. Keine Aenderungen an Quell-Notizen, keine Rueckfragen. Geeignet als Sensor in Scheduled Agents.
+
+`/decay scan-only older-than:12m folder:"03 Bereiche"`
+- Scan-Modus mit angepasstem Scope (12 Monate, Bereiche)
+- Output: wie oben, nur breiter
 
 ## Was der Skill tut (8 Schritte)
 
@@ -70,11 +94,16 @@ decay_notes: kurze Begruendung wenn noetig
 
 ### 7. Decay-Report
 
-Bericht in `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Decay Report.md` mit Zusammenfassung, Klassifikations-Listen und Mitigations-Vorschlag pro veralteter Notiz.
+Bericht in `03 Bereiche/Vault-Gesundheit/`. Dateiname haengt vom Modus ab:
+
+- Voll-Modus: `YYYY-MM-DD Decay Report.md`
+- Scan-Modus: `YYYY-MM-DD Decay Scan.md`
+
+Aufbau in beiden Faellen identisch: Zusammenfassung, Klassifikations-Listen, Mitigations-Vorschlag pro veralteter Notiz.
 
 ### 8. Log-Eintrag
 
-Append-only in `log.md`.
+Append-only in `log.md`. Praefix `decay` im Voll-Modus, `decay-scan` im Scan-Modus.
 
 ## Hintergrund: Warum dieser Skill?
 
@@ -112,14 +141,15 @@ Die drei Skills ergeben zusammen das Kuratierungs-Set fuer das SecondBrain.
 
 ## Regeln
 
-1. **IMMER Preview vor Schreiben** — Frontmatter wird nie ohne Bestaetigung gesetzt
-2. **NIE Inhalt aendern** — Decay markiert nur
-3. **NIE loeschen oder archivieren** — Mitigation ist Vorschlag
-4. **Web-Calls sparsam** — pro Notiz max 3, ueber Notizen hinweg bundeln
-5. **Hard-Excludes respektieren** — Daily Notes, Archiv, Inbox, Kontext, Anhaenge nie pruefen
-6. **Begruendung Pflicht** bei `ueberpruefen` und `veraltet`
-7. **Log append-only** — bestehende Eintraege nie aendern
-8. **Sprache: Deutsch** — Ausgaben und Report-Texte auf Deutsch
+1. **IMMER Preview vor Schreiben im Voll-Modus** — Frontmatter wird nie ohne Bestaetigung gesetzt
+2. **Scan-Modus schreibt nie in Quell-Notizen** — nur Scan-Report und Log-Eintrag
+3. **NIE Inhalt aendern** — Decay markiert nur
+4. **NIE loeschen oder archivieren** — Mitigation ist Vorschlag
+5. **Web-Calls sparsam** — pro Notiz max 3, ueber Notizen hinweg bundeln
+6. **Hard-Excludes respektieren** — Daily Notes, Archiv, Inbox, Kontext, Anhaenge nie pruefen
+7. **Begruendung Pflicht** bei `ueberpruefen` und `veraltet` (Voll-Modus)
+8. **Log append-only** — bestehende Eintraege nie aendern; Praefix `decay` im Voll-Modus, `decay-scan` im Scan-Modus
+9. **Sprache: Deutsch** — Ausgaben und Report-Texte auf Deutsch
 
 ## Dateistruktur
 
@@ -145,4 +175,5 @@ decay/
 
 | Version | Datum | Aenderungen |
 |---------|-------|-------------|
+| 1.0.1 | 2026-06-13 | Scan-Modus eingefuehrt fuer Routine-Auslosung (autonom, kein Frontmatter-Write) |
 | 1.0.0 | 2026-06-13 | Initial release: 8-Schritte-Workflow mit Web-Validierung, Frontmatter-Markierung, Report in Vault-Gesundheit/ |

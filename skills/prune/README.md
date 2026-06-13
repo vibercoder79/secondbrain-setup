@@ -12,7 +12,7 @@ Teil des Kuratierungs-Patterns mit `/lint` (Diagnose), `/synthesize` (Verdichtun
 
 ## Version
 
-**v1.0.0** (Juni 2026) — Initial release.
+**v1.0.1** (Juni 2026) — Scan-Modus eingefuehrt fuer Routine-Auslosung.
 
 ## Installation
 
@@ -35,9 +35,60 @@ Pruefen:
 | `/prune orphans` | Nur persistente Orphans (drei Lint-Laeufe) |
 | `/prune inbox` | Nur alte Brain Dumps in `01 Inbox/` |
 | `/prune veraltet` | Nur `freshness: veraltet` Notizen |
+| `/prune scan-only` | Scan-Modus, schreibt nur Vorschlagsliste, keine Aktionen |
+| `/prune scan-only category:duplicates` | Scan-Modus, nur Duplikate |
+| `/prune scan-only category:orphans` | Scan-Modus, nur Orphans |
+| `/prune scan-only category:brain-dumps` | Scan-Modus, nur alte Brain Dumps |
+| `/prune scan-only category:decayed` | Scan-Modus, nur veraltete Notizen |
 
 Weitere Ausloeser: `loesch-vorschlaege`, `vault entruempeln`, `aussortieren`,
 `duplikate finden`, `alte orphans aufraeumen`.
+
+## Modi
+
+| Modus | Auslosung | Wirkung | Routine-tauglich |
+|-------|-----------|---------|------------------|
+| Voll-Modus (Default) | manuell | Einzel-Confirmation, echte Loeschungen und Archivierungen | nein (interaktiv) |
+| Scan-Modus (`scan-only`) | manuell oder Routine | Vorschlagsliste als Scan-Report, KEINE Aktionen | ja (autonom) |
+
+Scan ist der Sensor, der Voll-Lauf bleibt strikt manuell. Loeschungen und
+Archivierungen duerfen niemals automatisierbar sein. Der Scan-Modus liefert nur
+das Bild, die Entscheidung trifft immer der Nutzer im Voll-Lauf.
+
+### Beispiel: Scan-Lauf
+
+```
+/prune scan-only
+```
+
+Sample-Output (gekuerzt):
+
+```markdown
+# Prune Scan — 2026-06-13
+
+- Lauf-Datum: 2026-06-13
+- Scope: alle
+- Gesamtzahl Kandidaten: 12
+
+## Duplikate
+
+| Pfad A | Pfad B | Aehnlichkeit | Begruendung | Empfehlung |
+|--------|--------|--------------|-------------|------------|
+| 04 Ressourcen/.../Setup Web Clipper.md | 01 Inbox/Setup Web Clipper.md | 0.82 | juenger, weniger Backlinks | loeschen |
+
+## Alte Brain Dumps
+
+| Pfad | Begruendung | Empfehlung |
+|------|-------------|------------|
+| 01 Inbox/Gedanke RAG vs. Wiki.md | 13 Monate, keine Backlinks | archivieren |
+
+---
+
+Folge-Schritt: `/prune` manuell starten und Einzel-Confirmation durchgehen.
+```
+
+Es werden keine Dateien geloescht oder verschoben. Der Scan-Report liegt unter
+`03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Prune Scan.md`.
 
 ## Kategorien
 
@@ -82,6 +133,10 @@ zurueckliegt. Empfehlung: immer archivieren.
 3. **Bei Unsicherheit: archivieren statt loeschen.**
 4. **Schutzzonen:** `00 Kontext/`, `CLAUDE.md`, `log.md`, `Index.md`,
    `03 Bereiche/Skills/`, `07 Anhaenge/`, Daily Notes.
+5. **Scan-Modus ist die einzige autonomisierbare Variante.** Loeschung und
+   Archivierung bleiben strikt interaktiv. Eine Routine darf `/prune scan-only`
+   ausfuehren, niemals `/prune`. Damit ist sichergestellt, dass kein Routine-Lauf
+   jemals Dateien anfassen kann.
 
 ## Workflow
 
@@ -137,3 +192,4 @@ prune/
 | Version | Datum | Aenderungen |
 |---------|-------|-------------|
 | 1.0.0 | 2026-06-13 | Initial release: 4-Kategorien-Workflow mit Einzel-Confirmation |
+| 1.0.1 | 2026-06-13 | Scan-Modus eingefuehrt fuer Routine-Auslosung (autonom, kein rm/mv). Voll-Modus unveraendert. |

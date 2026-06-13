@@ -175,9 +175,11 @@ Skill source: [`../skills/synthesize/`](../skills/synthesize/).
 
 ### `decay` — flag aging
 
+**Modes:** full mode + scan mode (v1.0.1).
+
 **Triggers:** `/decay`, `/decay older-than:12m folder:"03 Bereiche"`,
-`/decay note:"<note>"`, or phrases like "decay check", "ist das noch
-aktuell", "pruefe alte notizen", "freshness check".
+`/decay scan-only`, `/decay note:"<note>"`, or phrases like "decay check",
+"ist das noch aktuell", "pruefe alte notizen", "freshness check".
 
 **What it does**
 
@@ -216,9 +218,12 @@ Skill source: [`../skills/decay/`](../skills/decay/).
 
 ### `prune` — remove ballast
 
-**Triggers:** `/prune`, `/prune duplikate`, `/prune orphans`, `/prune
-inbox`, `/prune veraltet`, or phrases like "prune", "loesch-vorschlaege",
-"vault entruempeln", "duplikate finden", "alte orphans aufraeumen".
+**Modes:** full mode + scan mode (v1.0.1).
+
+**Triggers:** `/prune`, `/prune scan-only`, `/prune duplikate`,
+`/prune orphans`, `/prune inbox`, `/prune veraltet`, or phrases like "prune",
+"loesch-vorschlaege", "vault entruempeln", "duplikate finden", "alte orphans
+aufraeumen".
 
 **What it does**
 
@@ -344,6 +349,80 @@ in the friction. It forces a decision the AI cannot take.
   assumed here.
 - [`../skills/README.md`](../skills/README.md) lists all six skills with
   install commands.
+
+## Skills and routines — who does what?
+
+Skills define the what, routines define the when. A skill is the logic, the
+steps and the tool calls. A routine (scheduled agent) is only the trigger
+moment. Routines call skills. They are complementary, not an either-or.
+
+> Paths and tag names in the prompts below match the German vault structure
+> shown in chapter 03.
+
+### Skill versus routine
+
+| | Skill | Routine (scheduled agent) |
+| --- | --- | --- |
+| Function | Workflow (logic, steps, tool calls) | Trigger (timing, frequency) |
+| Where it runs | Locally on your Mac in Claude Code | Server-side (Anthropic routine) or local cron |
+| Mac must be on | yes | no for an Anthropic routine |
+| Interaction | yes, with confirmation | no, autonomous |
+| Example | `/synthesize cluster:"04 Ressourcen/KI"` | Sunday 8 pm runs `/lint` |
+
+### What fits which skill?
+
+| Skill | Manual | Routine-ready | When a routine makes sense |
+| --- | --- | --- | --- |
+| `/projekt-init` | yes | no | only on an explicit project creation |
+| `/ingest` | yes | no | one note at a time, interactive |
+| `/lint` | yes | **yes** | weekly, autonomous |
+| `/lint index` | yes | **yes** | daily, autonomous |
+| `/synthesize` | yes | no | condensation is creative, always manual |
+| `/decay scan-only` | yes | **yes** | monthly, autonomous, as a sensor |
+| `/decay` (full) | yes | no | follow-up run, manual, after the scan report |
+| `/prune scan-only` | yes | **yes** | quarterly, autonomous, as a sensor |
+| `/prune` (full) | yes | no | deletion always manual with per-item confirmation |
+
+### Pattern: routine detects, skill decides
+
+Routines are sensors. They run autonomously, scan the vault and write a
+report. They do not change content. The human decides in the follow-up run
+what actually happens. That is the trick: detection becomes cheap and
+regular, decision stays deliberate and expensive.
+
+### Setting up the routines
+
+You can paste the four prompts below directly into Claude Code. They register
+server-side routines that reach the vault over MCP. Your Mac does not have to
+be on. Reports land in the vault under `03 Bereiche/Vault-Gesundheit/` and are
+read automatically by Claude on the next session start.
+
+```
+Prompt 1 - daily index refresh:
+/schedule "lint-index-daily" cron:"0 8 * * *" prompt:"/lint index"
+
+Prompt 2 - weekly full lint with report:
+/schedule "lint-weekly" cron:"0 20 * * 0" prompt:"/lint"
+
+Prompt 3 - monthly decay scan:
+/schedule "decay-scan-monthly" cron:"0 9 1 * *" prompt:"/decay scan-only folder:\"04 Ressourcen\" older-than:6m"
+
+Prompt 4 - quarterly prune scan:
+/schedule "prune-scan-quarterly" cron:"0 9 1 1,4,7,10 *" prompt:"/prune scan-only"
+```
+
+Prerequisite: the vault must be connected to the routine over MCP. Scan mode
+only writes reports (`YYYY-MM-DD Decay Scan.md` and
+`YYYY-MM-DD Prune Scan.md`); no frontmatter writes, no deletions. The
+follow-up run in full mode happens manually, with per-item confirmation.
+
+### Safety anchor
+
+Some skills are deliberately not routine-ready. `/synthesize` because
+condensation is creative and your own thinking cannot be delegated. The full
+mode of `/prune` because deletions must never be autonomized, no matter how
+clean the logging looks. This line is drawn on purpose, it is not a technical
+limitation. Routines detect, the human decides.
 
 ## End of the handbook
 

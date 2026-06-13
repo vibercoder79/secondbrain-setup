@@ -6,7 +6,7 @@ description: >
   Strikt mit Einzel-Confirmation, kein Auto-Delete. Verwenden wenn der Nutzer
   "prune", "loesch-vorschlaege", "vault entruempeln", "aussortieren",
   "duplikate finden", "alte orphans aufraeumen" sagt.
-version: 1.0.0
+version: 1.0.1
 user-invocable: true
 allowed-tools:
   - Read
@@ -68,10 +68,101 @@ Prune tatsaechlich auf.
 | `/prune orphans` | Nur alte Orphans |
 | `/prune inbox` | Nur alte Brain Dumps in `01 Inbox/` |
 | `/prune veraltet` | Nur Notizen mit `freshness: veraltet` |
+| `/prune scan-only` | Reiner Scan-Modus, schreibt nur Vorschlagsliste, keine Aktionen |
+| `/prune scan-only category:duplicates` | Scan-Modus, nur Duplikate |
+| `/prune scan-only category:orphans` | Scan-Modus, nur Orphans |
+| `/prune scan-only category:brain-dumps` | Scan-Modus, nur alte Brain Dumps |
+| `/prune scan-only category:decayed` | Scan-Modus, nur veraltete Notizen |
 
 Wenn nichts angegeben wird, biete vor dem Lauf per AskUserQuestion an, den Scope einzuschraenken.
 
-## Workflow
+## Modi
+
+| Modus | Auslosung | Wirkung | Routine-tauglich |
+|-------|-----------|---------|------------------|
+| Voll-Modus (Default) | manuell | Einzel-Confirmation, echte Loeschungen und Archivierungen | nein (interaktiv) |
+| Scan-Modus (`scan-only`) | manuell oder Routine | Vorschlagsliste als Scan-Report, KEINE Aktionen | ja (autonom) |
+
+Scan ist der Sensor, der Voll-Lauf bleibt strikt manuell. Loeschungen und
+Archivierungen duerfen niemals automatisierbar sein — der Scan-Modus liefert nur
+das Bild, die Entscheidung trifft immer der Nutzer im interaktiven Voll-Lauf.
+
+## Workflow Scan-Modus (`scan-only`)
+
+Wenn der Aufruf `scan-only` enthaelt, gilt folgender verkuerzter, nicht-interaktiver Pfad:
+
+1. **Scope ableiten ohne Rueckfrage.** Default: alle vier Kategorien. Wenn ein
+   `category:<name>`-Filter mitgegeben ist (`duplicates`, `orphans`, `brain-dumps`,
+   `decayed`), nur diese Kategorie sammeln.
+2. **Backup-Check entfaellt.** Es werden keine Aktionen ausgefuehrt, also kein Risiko.
+3. **Kandidaten sammeln wie im Voll-Modus** (Schritt 2 unten). Dieselben Heuristiken,
+   dieselben Schutzzonen, dieselben Empfehlungs-Regeln.
+4. **Scan-Report schreiben** nach
+   `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Prune Scan.md` (Dateiname enthaelt "Scan"
+   statt "Log", damit klar vom interaktiven Lauf unterscheidbar).
+5. **Keine `rm`-, keine `mv`-Operationen.** Keine `AskUserQuestion`.
+6. **Log-Eintrag in `log.md`** mit Praefix `prune-scan` statt `prune`.
+
+Scan-Report-Format:
+
+```markdown
+---
+tags: [system, prune-scan]
+date: YYYY-MM-DD
+scope: <alle | duplicates | orphans | brain-dumps | decayed>
+source: claude
+chat_url: <falls bekannt, sonst unbekannt>
+---
+
+# Prune Scan — YYYY-MM-DD
+
+- Lauf-Datum: YYYY-MM-DD
+- Scope: <alle | nur duplicates | ...>
+- Gesamtzahl Kandidaten: N
+
+## Duplikate
+
+| Pfad A | Pfad B | Aehnlichkeit | Begruendung | Empfehlung |
+|--------|--------|--------------|-------------|------------|
+| ... | ... | 0.82 | juenger, weniger Backlinks | loeschen |
+
+## Alte Orphans
+
+| Pfad | Begruendung | Empfehlung |
+|------|-------------|------------|
+| ... | 3/3 Lint-Laeufe, 47 Worte | loeschen |
+
+## Alte Brain Dumps
+
+| Pfad | Begruendung | Empfehlung |
+|------|-------------|------------|
+| ... | 13 Monate, keine Backlinks | archivieren |
+
+## Veraltete Notizen
+
+| Pfad | Begruendung | Empfehlung |
+|------|-------------|------------|
+| ... | freshness: veraltet, Update vor 5 Monaten | archivieren |
+
+---
+
+Folge-Schritt: `/prune` manuell starten und Einzel-Confirmation durchgehen.
+```
+
+Append-Eintrag in `log.md`:
+
+```markdown
+## [YYYY-MM-DD] prune-scan | Scan-Lauf (autonom)
+
+- **Scope:** <alle | nur duplicates | ...>
+- **Kandidaten:** N
+- **Report:** [[YYYY-MM-DD Prune Scan]]
+- **Hinweis:** Keine Aktionen ausgefuehrt. Folge-Schritt: `/prune` manuell.
+```
+
+Damit endet der Scan-Modus. Die Schritte 3 bis 7 des Voll-Modus werden uebersprungen.
+
+## Workflow Voll-Modus
 
 ### Schritt 1: Scope und Kategorien waehlen
 

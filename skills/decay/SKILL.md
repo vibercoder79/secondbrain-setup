@@ -6,7 +6,7 @@ description: >
   freshness-Status in Frontmatter. Schreibt Decay-Report ins Vault-Gesundheit-Verzeichnis.
   Verwenden wenn der Nutzer "decay", "decay check", "ist das noch aktuell",
   "pruefe alte notizen", "freshness check" sagt.
-version: 1.0.0
+version: 1.0.1
 user-invocable: true
 allowed-tools:
   - Read
@@ -47,8 +47,19 @@ einzelner Notizen): Decay pruefte den Wahrheitsgehalt ueber Zeit.
 | `/decay folder:"03 Bereiche"` | Anderen Scope-Ordner waehlen |
 | `/decay older-than:3m folder:"02 Projekte"` | Kombinierbare Argumente |
 | `/decay note:"<Notiz>"` | Eine einzelne Notiz pruefen, unabhaengig vom Alter |
+| `/decay scan-only` | Scan-Modus: nur Report schreiben, keine Frontmatter-Aenderungen, autonom (kein Confirmation-Dialog). Kombinierbar mit `older-than:` und `folder:`. |
 
 Wenn Argumente unklar oder widerspruechlich sind: AskUserQuestion stellen, nicht raten.
+Ausnahme: Im Scan-Modus werden keine Rueckfragen gestellt — fehlende Argumente werden mit Defaults belegt.
+
+## Modi
+
+| Modus | Ausloesung | Wirkung | Routine-tauglich |
+|-------|------------|---------|------------------|
+| Voll-Modus (Default) | manuell | scannt, validiert, schreibt Frontmatter mit Confirmation, Report | nein (interaktiv) |
+| Scan-Modus (`scan-only`) | manuell oder Routine | scannt, validiert, schreibt nur Scan-Report, kein Frontmatter | ja (autonom) |
+
+**Aufgabenteilung der beiden Modi:** Der Scan-Modus ist der Sensor — er laeuft autonom in Routinen (Scheduled Agents), liefert einen Scan-Report und schreibt nichts in die Quell-Notizen. Der Voll-Modus ist die Aktion — er wird manuell ausgeloest, nachdem der Nutzer einen Scan-Report gesichtet hat, und schreibt die Klassifikation mit Confirmation in die Frontmatter.
 
 ## Workflow
 
@@ -56,14 +67,18 @@ Fuehre diese 6 Schritte der Reihe nach aus.
 
 ### Schritt 1: Scope waehlen
 
-1. **Argumente parsen** — `older-than:<n>m|y` und `folder:"..."` aus der User-Eingabe lesen.
-2. **Defaults setzen** wenn nicht angegeben:
+1. **Argumente parsen** — `older-than:<n>m|y`, `folder:"..."` und das Flag `scan-only` aus der User-Eingabe lesen.
+2. **Modus bestimmen:**
+   - Mit Flag `scan-only` -> Scan-Modus (autonom, kein Frontmatter-Write, keine Confirmation)
+   - Ohne Flag -> Voll-Modus (Default, interaktiv)
+3. **Defaults setzen** wenn nicht angegeben:
    - `older-than: 6m`
    - `folder: 04 Ressourcen`
-3. **Bei Unklarheit** AskUserQuestion mit konkreten Optionen:
+4. **Bei Unklarheit** im Voll-Modus AskUserQuestion mit konkreten Optionen:
    - Schwelle (3m, 6m, 12m)
    - Scope (`04 Ressourcen`, `03 Bereiche`, `02 Projekte`, gesamtes Vault)
-4. **Hard-Excludes** (nie pruefen):
+   - Im Scan-Modus keine Rueckfragen — Defaults gelten unmittelbar.
+5. **Hard-Excludes** (nie pruefen):
    - `05 Daily Notes/` — Tageslogs sind per Definition Zeitstempel, keine Wahrheits-Aussagen
    - `06 Archiv/` — bewusst eingefroren
    - `07 Anhaenge/` — keine Markdown-Inhalte
@@ -150,10 +165,15 @@ Fuer Notizen mit pruefbaren Aussagen:
    oder abbrechen?"
 3. **Bei Bestaetigung** weiter zu Schritt 6. Bei "einzeln" pro Datei nachfragen.
 
-### Schritt 6: Frontmatter schreiben
+**Im Scan-Modus:** Schritt 5 und Schritt 6 entfallen vollstaendig. Keine Preview, keine
+Confirmation, kein Frontmatter-Write. Direkt weiter zu Schritt 7.
+
+### Schritt 6: Frontmatter schreiben (nur Voll-Modus)
 
 Pro Notiz die YAML-Frontmatter erweitern (nicht ersetzen). Wenn keine Frontmatter
 existiert, eine minimale anlegen.
+
+**Im Scan-Modus uebersprungen.** Quell-Notizen werden nie veraendert.
 
 Felder:
 
@@ -173,7 +193,12 @@ Regeln:
 
 ### Schritt 7: Decay-Report schreiben
 
-Bericht ablegen in `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Decay Report.md`:
+Bericht ablegen je nach Modus:
+
+- **Voll-Modus:** `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Decay Report.md`
+- **Scan-Modus:** `03 Bereiche/Vault-Gesundheit/YYYY-MM-DD Decay Scan.md` (Dateiname mit "Scan" statt "Report", damit beide Modi unterscheidbar bleiben)
+
+Inhalt identisch (Zusammenfassung, Klassifikations-Listen, Mitigations-Vorschlaege). Beispiel-Aufbau:
 
 ```markdown
 ---
@@ -215,7 +240,12 @@ chat_url: unbekannt
 
 ### Schritt 8: Log-Eintrag
 
-Append-only in `log.md`:
+Append-only in `log.md`. Praefix richtet sich nach Modus:
+
+- **Voll-Modus:** Praefix `decay`
+- **Scan-Modus:** Praefix `decay-scan`
+
+Voll-Modus-Beispiel:
 
 ```markdown
 ## [2026-06-13] decay | Freshness-Check 04 Ressourcen
@@ -227,13 +257,27 @@ Append-only in `log.md`:
 - **Report:** [[2026-06-13 Decay Report]]
 ```
 
+Scan-Modus-Beispiel:
+
+```markdown
+## [2026-06-13] decay-scan | Freshness-Scan 04 Ressourcen
+
+- **Scope:** 04 Ressourcen, Schwelle 6 Monate
+- **Geprueft:** 12 Notizen
+- **Klassifikation:** 8 gueltig, 3 ueberpruefen, 1 veraltet
+- **Web-Calls:** 7 WebSearch, 2 WebFetch
+- **Report:** [[2026-06-13 Decay Scan]]
+- **Frontmatter-Aenderungen:** keine (Scan-Modus)
+```
+
 ## Regeln
 
-1. **IMMER Preview vor Schreiben** — Frontmatter wird nie ohne Bestaetigung gesetzt
-2. **NIE Inhalt aendern** — Decay markiert nur, korrigiert nicht
-3. **NIE loeschen oder archivieren** — Mitigation ist Vorschlag, nie Aktion
-4. **Web-Calls sparsam** — pro Notiz hoechstens 3, ueber Notizen hinweg bundeln
-5. **Daily Notes, Archiv, Inbox, Kontext, Anhaenge ausnehmen** (Hard-Excludes Schritt 1)
-6. **Begruendung in `decay_notes`** ist Pflicht bei `ueberpruefen` und `veraltet`
-7. **Log ist append-only** — nie bestehende Eintraege aendern
-8. **Sprache: Deutsch** — alle Ausgaben und Report-Texte auf Deutsch
+1. **IMMER Preview vor Schreiben im Voll-Modus** — Frontmatter wird nie ohne Bestaetigung gesetzt
+2. **Scan-Modus schreibt nie in Quell-Notizen** — nur Scan-Report und Log-Eintrag
+3. **NIE Inhalt aendern** — Decay markiert nur, korrigiert nicht
+4. **NIE loeschen oder archivieren** — Mitigation ist Vorschlag, nie Aktion
+5. **Web-Calls sparsam** — pro Notiz hoechstens 3, ueber Notizen hinweg bundeln
+6. **Daily Notes, Archiv, Inbox, Kontext, Anhaenge ausnehmen** (Hard-Excludes Schritt 1)
+7. **Begruendung in `decay_notes`** ist Pflicht bei `ueberpruefen` und `veraltet` (nur Voll-Modus)
+8. **Log ist append-only** — nie bestehende Eintraege aendern; Praefix `decay` im Voll-Modus, `decay-scan` im Scan-Modus
+9. **Sprache: Deutsch** — alle Ausgaben und Report-Texte auf Deutsch
